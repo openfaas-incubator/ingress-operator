@@ -25,11 +25,11 @@ This project addresses the following Proposal for Kubernetes: [Proposal: define 
 
 > Looking for a tutorial? See the [OpenFaaS documentation](https://docs.openfaas.com/reference/authentication/)
 
-Supported cert-manager version: [0.11.0](https://docs.cert-manager.io/en/latest/tasks/upgrading/upgrading-0.10-0.11.html)
+Minimum supported cert-manager version: [v1.0](https://cert-manager.io/docs/release-notes/release-notes-1.0/)
 
 ## Schema
 
-This is an Operator / controller to build Kubernetes `Ingress` and JetStack `Certificate` objects for functions.
+This is an Operator / controller to build Kubernetes `Ingress` and `cert-manager` `Certificate` objects for functions.
 
 The following example would expose the `nodeinfo` function from the store as a URL: `nodeinfo.myfaas.club`.
 
@@ -164,11 +164,11 @@ nodeinfo.myfaas.club  178.128.137.209
 
 If using TLS, then install [cert-manager](https://docs.openfaas.com/reference/ssl/kubernetes-with-cert-manager/#install-cert-manager).
 
-Now create an issuer to use the staging endpoint:
+Now [create an issuer](https://cert-manager.io/docs/configuration/) to use the staging endpoint:
 
 ```yaml
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: letsencrypt-staging
@@ -194,7 +194,7 @@ spec:
 or ClusterIssuer
 
 ```yaml
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging
@@ -339,8 +339,7 @@ spec:
     issuerRef:
       name: "letsencrypt-staging"
       # Change to ClusterIssuer if required
-      # https://docs.cert-manager.io/en/latest/reference/clusterissuers.html
-      # https://docs.cert-manager.io/en/latest/reference/issuers.html
+      # https://cert-manager.io/docs/concepts/issuer/
       kind: "Issuer"
 ```
 
