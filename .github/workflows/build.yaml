@@ -23,6 +23,9 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+      - name: Get Repo Owner
+        id: get_repo_owner
+        run: echo ::set-output name=repo_owner::$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
 
       - name: Build x86_64 container into library
         uses: docker/build-push-action@v2
@@ -32,7 +35,7 @@ jobs:
           outputs: "type=docker,push=false"
           platforms: linux/amd64
           tags: |
-            ghcr.io/openfaas/ingress-operator:${{ github.sha }}
+            ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/ingress-operator:${{ github.sha }}
 
       - name: Build multi-arch containers for validation only
         uses: docker/build-push-action@v2
@@ -42,4 +45,4 @@ jobs:
           outputs: "type=image,push=false"
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           tags: |
-            ghcr.io/openfaas/ingress-operator:${{ github.sha }}
+            ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/ingress-operator:${{ github.sha }}

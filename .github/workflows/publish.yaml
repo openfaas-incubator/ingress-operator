@@ -22,17 +22,20 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      - name: Get TAG
-        id: get_tag
-        run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
       - name: Login to Docker Registry
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
+
+      - name: Get TAG
+        id: get_tag
+        run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+      - name: Get Repo Owner
+        id: get_repo_owner
+        run: echo ::set-output name=repo_owner::$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
+
       - name: Push containers
         uses: docker/build-push-action@v2
         with:
@@ -41,6 +44,6 @@ jobs:
           outputs: "type=registry,push=true"
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           tags: |
-            ghcr.io/openfaas/ingress-operator:${{ github.sha }}
-            ghcr.io/openfaas/ingress-operator:${{ steps.get_tag.outputs.TAG }}
-            ghcr.io/openfaas/ingress-operator:latest
+            ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/ingress-operator:${{ github.sha }}
+            ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/ingress-operator:${{ steps.get_tag.outputs.TAG }}
+            ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/ingress-operator:latest
